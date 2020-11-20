@@ -1,5 +1,7 @@
 package com.yite.guess
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -35,6 +37,11 @@ class MaterialActivity : AppCompatActivity() {
         secretNumber.printNumber()
         tv_number.text = secretNumber.count.toString()
         tv_secret.text = "secretNumber is " + secretNumber.secret.toString()
+
+        var count = getSharedPreferences("guess", Context.MODE_PRIVATE).getInt("REC_COUNTER", -1)
+        var nick = getSharedPreferences("guess", Context.MODE_PRIVATE).getString("REC_NICKNAME", null)
+        Log.e(TAG, "count = $count , nickName = $nick")
+
     }
 
     fun check(view: View){
@@ -48,7 +55,7 @@ class MaterialActivity : AppCompatActivity() {
             val diff = secretNumber.validate(n)
             var message = when {
                 diff < 0 -> {
-                    getString(R.string.yes_you_got_it)
+                    getString(R.string.bigger)
                 }
                 diff > 0 -> {
                     getString(R.string.smaller)
@@ -65,7 +72,13 @@ class MaterialActivity : AppCompatActivity() {
             AlertDialog.Builder(context)
                 .setTitle(getString(R.string.dialog_title))
                 .setMessage(message)
-                .setPositiveButton(getString(R.string.ok), null)
+                .setPositiveButton(getString(R.string.ok)) { _, _ ->
+                    if (diff == 0) {
+                        val intent = Intent(this, RecordActivity::class.java)
+                        intent.putExtra("counter",secretNumber.count)
+                        startActivity(intent)
+                    }
+                }
                 .show()
         }else{
             Toast.makeText(this, "請輸入整數", Toast.LENGTH_SHORT).show()

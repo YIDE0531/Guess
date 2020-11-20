@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
             val diff = secretNumber.validate(n)
             var message = when {
                 diff < 0 -> {
-                    getString(R.string.yes_you_got_it)
+                    getString(R.string.bigger)
                 }
                 diff > 0 -> {
                     getString(R.string.smaller)

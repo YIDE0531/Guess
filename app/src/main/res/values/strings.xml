@@ -2,7 +2,7 @@
     <string name="app_name">Guess</string>
     <string name="please_enter_number">Please enter a number(1~10)</string>
     <string name="ok">OK</string>
-    <string name="yes_you_got_it">bigger</string>
+    <string name="bigger">bigger</string>
     <string name="smaller">smaller</string>
     <string name="yes">YES</string>
     <string name="dialog_title">Message</string>
