@@ -1,5 +1,6 @@
 package com.yite.guess
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +13,7 @@ import kotlinx.android.synthetic.main.activity_material.*
 import kotlinx.android.synthetic.main.content_material.*
 
 class MaterialActivity : AppCompatActivity() {
+    private val REQUEST_RECORD = 101
     var secretNumber = SecretNumber()
     var context = this
     val TAG = MaterialActivity::class.java.simpleName
@@ -22,26 +24,33 @@ class MaterialActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         fab.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle(getString(R.string.replay_game))
-                .setMessage(getString(R.string.are_you_sure))
-                .setPositiveButton(getString(R.string.ok)) { _, _ ->
-                    secretNumber.reset()
-                    tv_number.text = secretNumber.count.toString()
-                    edt_number.setText("")
-                    tv_secret.text = "secretNumber is " + secretNumber.secret.toString()
-                }
-                .setNeutralButton(getString(R.string.cancel), null)
-                .show()
+            replay()
         }
         secretNumber.printNumber()
         tv_number.text = secretNumber.count.toString()
         tv_secret.text = "secretNumber is " + secretNumber.secret.toString()
 
         var count = getSharedPreferences("guess", Context.MODE_PRIVATE).getInt("REC_COUNTER", -1)
-        var nick = getSharedPreferences("guess", Context.MODE_PRIVATE).getString("REC_NICKNAME", null)
+        var nick = getSharedPreferences("guess", Context.MODE_PRIVATE).getString(
+            "REC_NICKNAME",
+            null
+        )
         Log.e(TAG, "count = $count , nickName = $nick")
 
+    }
+
+    private fun replay() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.replay_game))
+            .setMessage(getString(R.string.are_you_sure))
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
+                secretNumber.reset()
+                tv_number.text = secretNumber.count.toString()
+                edt_number.setText("")
+                tv_secret.text = "secretNumber is " + secretNumber.secret.toString()
+            }
+            .setNeutralButton(getString(R.string.cancel), null)
+            .show()
     }
 
     fun check(view: View){
@@ -75,13 +84,24 @@ class MaterialActivity : AppCompatActivity() {
                 .setPositiveButton(getString(R.string.ok)) { _, _ ->
                     if (diff == 0) {
                         val intent = Intent(this, RecordActivity::class.java)
-                        intent.putExtra("counter",secretNumber.count)
-                        startActivity(intent)
+                        intent.putExtra("counter", secretNumber.count)
+                        startActivityForResult(intent, REQUEST_RECORD)
                     }
                 }
                 .show()
         }else{
             Toast.makeText(this, "請輸入整數", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_RECORD){
+            if(resultCode == Activity.RESULT_OK){
+                val nickName = data?.getStringExtra("NICK")
+                Log.e(TAG, nickName.toString())
+                replay()
+            }
         }
     }
 }
